@@ -18,3 +18,7 @@ notifications:
       - mallet322@gmail.com
     on_success: never # default: change
     on_failure: always # default: always
+
+env:
+  global:
+    - CODECOV_TOKEN='f32a8786-f921-4a6b-8215-6d73b4a1a1dd'
