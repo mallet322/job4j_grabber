@@ -17,16 +17,13 @@ public class Post {
 
     private String description;
 
-    private final LocalDateTime created = LocalDateTime.now();
+    private final LocalDateTime created;
 
-    public Post() {
-    }
-
-    public Post(int id, String title, String link, String description) {
-        this.id = id;
+    public Post(String title, String link, String description, LocalDateTime created) {
         this.title = title;
         this.link = link;
         this.description = description;
+        this.created = created;
     }
 
     public int getId() {
