@@ -11,6 +11,9 @@ import org.jsoup.select.Elements;
 
 public class SqlRuParse {
 
+    private static final String VACANCY_URL =
+            "https://www.sql.ru/forum/1325330/lidy-be-fe-senior-cistemnye-analitiki-qa-i-devops-moskva-do-200t";
+
     public static void main(String[] args) throws Exception {
         List<String> pages = getPages();
         for (String url : pages) {
@@ -18,6 +21,7 @@ public class SqlRuParse {
             Elements rows = doc.select(".postslisttopic");
             printAllVacancies(rows);
         }
+        printVacancyDetail(VACANCY_URL);
     }
 
     private static void printAllVacancies(List<Element> row) {
@@ -35,6 +39,28 @@ public class SqlRuParse {
             System.out.println("Автор: " + author);
             System.out.println(jobHref);
         }
+    }
+
+    private static void printVacancyDetail(String url) throws Exception {
+        Document doc = Jsoup.connect(url).get();
+        String vacancyDescription = getVacancyDescription(doc);
+        String date = getVacancyDate(doc);
+        System.out.println("Описание: " + vacancyDescription);
+        System.out.println("Дата: " + date);
+    }
+
+    private static String getVacancyDescription(Document document) {
+        StringBuilder builder = new StringBuilder();
+        String html = document.select(".msgBody").get(1).html();
+        String[] htmlArr = html.split("<br>");
+        for (String str : htmlArr) {
+            builder.append(str).append(System.lineSeparator());
+        }
+        return builder.toString();
+    }
+
+    private static String getVacancyDate(Document doc) {
+        return doc.select(".msgFooter").get(0).text().substring(0, 16);
     }
 
     private static List<String> getPages() {
