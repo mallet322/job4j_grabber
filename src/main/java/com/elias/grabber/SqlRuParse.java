@@ -1,4 +1,4 @@
-package com.elias.quartz;
+package com.elias.grabber;
 
 import java.util.ArrayList;
 import java.util.List;
