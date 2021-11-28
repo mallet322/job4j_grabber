@@ -2,6 +2,8 @@ package com.elias.quartz;
 
 import java.util.List;
 
+import com.elias.grabber.utils.DateTimeParser;
+import com.elias.grabber.utils.SqlRuDateTimeParser;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -10,6 +12,7 @@ import org.jsoup.select.Elements;
 public class SqlRuParse {
 
     public static void main(String[] args) throws Exception {
+        DateTimeParser dateParser = new SqlRuDateTimeParser();
         Document doc = Jsoup.connect("https://www.sql.ru/forum/job-offers").get();
         Elements row = doc.select(".postslisttopic");
         List<Element> jobs = row.subList(3, row.size());
@@ -19,7 +22,7 @@ public class SqlRuParse {
             var jobText = job.text();
             var jobHref = job.attr("href");
             var author = parent.children().get(2).child(0).text();
-            var date = parent.children().get(5).text();
+            var date = dateParser.parse(parent.children().get(5).text());
             System.out.println("Вакансия: " + jobText);
             System.out.println("Дата: " + date);
             System.out.println("Автор: " + author);
