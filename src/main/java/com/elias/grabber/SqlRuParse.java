@@ -22,7 +22,7 @@ public class SqlRuParse {
 
     public static void main(String[] args) {
         try {
-            var dateParser = new SqlRuDateTimeParser();
+            DateTimeParser dateParser = new SqlRuDateTimeParser();
             List<String> pages = getPages();
             for (String url : pages) {
                 Document doc = Jsoup.connect(url).get();
@@ -61,10 +61,10 @@ public class SqlRuParse {
     }
 
     private static Post getPost(String link, DateTimeParser dateParser) throws Exception {
-        Document doc = Jsoup.connect(link).get();
-        String title = getVacancyTitle(doc);
-        String description = getVacancyDescription(doc);
-        LocalDateTime createdDate = dateParser.parse(getVacancyDate(doc));
+        var doc = Jsoup.connect(link).get();
+        var title = getVacancyTitle(doc);
+        var description = getVacancyDescription(doc);
+        var createdDate = dateParser.parse(getVacancyDate(doc));
         return new Post(title, link, description, createdDate);
     }
 
