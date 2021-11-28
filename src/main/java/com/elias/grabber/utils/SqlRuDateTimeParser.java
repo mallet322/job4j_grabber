@@ -18,7 +18,7 @@ public class SqlRuDateTimeParser implements DateTimeParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(SqlRuDateTimeParser.class.getName());
     private static final String[] MONTHS = new String[] {
-            "янв", "фев", "мар", "апр", "май", "июнь", "июль", "авг", "сен", "окт", "ноя", "дек"
+            "янв", "фев", "мар", "апр", "май", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"
     };
     private static final Locale LOCALE_RU = new Locale("ru");
     private static final String DATE_FORMAT_PATTERN = "dd MMM yy, HH:mm";
