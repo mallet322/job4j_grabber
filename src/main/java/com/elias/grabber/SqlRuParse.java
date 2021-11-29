@@ -44,7 +44,9 @@ public class SqlRuParse implements Parse {
                 Element parent = td.parent();
                 var job = parent.children().get(1).child(0);
                 var href = job.attr("href");
-                posts.add(detail(href));
+                if (checkJavaVacancy(job.text())) {
+                    posts.add(detail(href));
+                }
             }
         }
         return posts;
@@ -88,6 +90,10 @@ public class SqlRuParse implements Parse {
     private LocalDateTime getVacancyDate(Document doc) {
         String result = doc.select(".msgFooter").first().text();
         return dateTimeParser.parse(result.substring(0, result.indexOf(" [")));
+    }
+
+    private boolean checkJavaVacancy(String vacancyName) {
+        return vacancyName.contains("Java") && !vacancyName.contains("Javascript");
     }
 
 }
