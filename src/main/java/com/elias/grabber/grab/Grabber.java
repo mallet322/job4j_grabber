@@ -3,10 +3,15 @@ package com.elias.grabber.grab;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.nio.charset.Charset;
 import java.util.Properties;
 
 import com.elias.grabber.Parse;
 import com.elias.grabber.SqlRuParse;
+import com.elias.grabber.model.Post;
 import com.elias.grabber.store.PsqlStore;
 import com.elias.grabber.store.Store;
 import com.elias.grabber.utils.DateTimeParser;
@@ -22,10 +27,15 @@ import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.impl.StdSchedulerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Grabber implements Grab {
 
+    private static final Logger LOG = LoggerFactory.getLogger(Grabber.class.getName());
+
     private static final String PATH = "C:\\projects\\job4j_grabber\\src\\main\\resources\\app.properties";
+
     private static final String SQL_RU_URL = "https://www.sql.ru/forum/job-offers/";
 
     private final Properties cfg = new Properties();
@@ -51,17 +61,41 @@ public class Grabber implements Grab {
         JobDataMap data = new JobDataMap();
         data.put("store", store);
         data.put("parse", parse);
-        JobDetail job = JobBuilder.newJob(GrabJob.class)
-                .usingJobData(data)
-                .build();
-        SimpleScheduleBuilder times = SimpleScheduleBuilder.simpleSchedule()
-                .withIntervalInSeconds(Integer.parseInt(cfg.getProperty("time")))
-                .repeatForever();
-        Trigger trigger = TriggerBuilder.newTrigger()
-                .startNow()
-                .withSchedule(times)
-                .build();
+        JobDetail job =
+                JobBuilder.newJob(GrabJob.class)
+                          .usingJobData(data)
+                          .build();
+        SimpleScheduleBuilder times =
+                SimpleScheduleBuilder.simpleSchedule()
+                                     .withIntervalInSeconds(Integer.parseInt(cfg.getProperty("time")))
+                                     .repeatForever();
+        Trigger trigger =
+                TriggerBuilder.newTrigger()
+                              .startNow()
+                              .withSchedule(times)
+                              .build();
         scheduler.scheduleJob(job, trigger);
+    }
+
+    public void web(Store store) {
+        new Thread(() -> {
+            try (ServerSocket server = new ServerSocket(Integer.parseInt(cfg.getProperty("port")))) {
+                while (!server.isClosed()) {
+                    Socket socket = server.accept();
+                    try (OutputStream out = socket.getOutputStream()) {
+                        out.write("HTTP/1.1 200 OK\r\n\r\n".getBytes());
+                        for (Post post : store.getAll()) {
+                            out.write(post.toString().getBytes(Charset.forName("Windows-1251")));
+                            out.write(System.lineSeparator().getBytes());
+                        }
+                    } catch (IOException io) {
+                        LOG.warn("Server response error", io);
+                    }
+                }
+            } catch (Exception e) {
+                LOG.warn("ServerSocket error", e);
+            }
+        }).start();
     }
 
     public static class GrabJob implements Job {
@@ -84,6 +118,7 @@ public class Grabber implements Grab {
         Scheduler scheduler = grab.scheduler();
         Store store = grab.store();
         grab.init(new SqlRuParse(dateParser), store, scheduler);
+        grab.web(store);
     }
 
 }
