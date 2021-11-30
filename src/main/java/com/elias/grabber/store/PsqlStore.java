@@ -105,7 +105,7 @@ public class PsqlStore implements Store, AutoCloseable {
                     config.getProperty("jdbc.password")
             );
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.warn("Init database connection error", e);
         }
         return connection;
     }
