@@ -3,6 +3,7 @@ package com.elias.grabber;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 
 import com.elias.grabber.model.Post;
@@ -48,10 +49,12 @@ public class SqlRuParse implements Parse {
             var vacancies = row.subList(3, row.size());
             for (Element td : vacancies) {
                 Element parent = td.parent();
-                var job = parent.children().get(1).child(0);
-                var href = job.attr("href");
-                if (checkJavaVacancy(job.text())) {
-                    posts.add(detail(href));
+                if (parent != null) {
+                    var job = parent.children().get(1).child(0);
+                    var href = job.attr("href");
+                    if (checkJavaVacancy(job.text())) {
+                        posts.add(detail(href));
+                    }
                 }
             }
         }
@@ -86,7 +89,7 @@ public class SqlRuParse implements Parse {
     }
 
     private String getVacancyTitle(Document doc) {
-        return doc.select(".messageHeader").first().ownText();
+        return Objects.requireNonNull(doc.select(".messageHeader").first()).ownText();
     }
 
     private String getVacancyDescription(Document document) {
@@ -94,7 +97,7 @@ public class SqlRuParse implements Parse {
     }
 
     private LocalDateTime getVacancyDate(Document doc) {
-        String result = doc.select(".msgFooter").first().text();
+        String result = Objects.requireNonNull(doc.select(".msgFooter").first()).text();
         return dateTimeParser.parse(result.substring(0, result.indexOf(" [")));
     }
 
