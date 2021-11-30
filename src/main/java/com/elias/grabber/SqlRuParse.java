@@ -3,8 +3,11 @@ package com.elias.grabber;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import com.elias.grabber.model.Post;
+import com.elias.grabber.store.PsqlStore;
+import com.elias.grabber.store.Store;
 import com.elias.grabber.utils.DateTimeParser;
 import com.elias.grabber.utils.SqlRuDateTimeParser;
 import org.jsoup.Jsoup;
@@ -18,7 +21,8 @@ public class SqlRuParse implements Parse {
     private static final Logger LOG = LoggerFactory.getLogger(SqlRuParse.class.getName());
 
     private static final String SITE_URL = "https://www.sql.ru/forum/job-offers/";
-    private static final String VACANCY_URL = "https://www.sql.ru/forum/1334377/razrabotchik-pl-sql?hl=pl%20sql";
+
+    private static final Properties CFG = new Properties();
 
     private final DateTimeParser dateTimeParser;
 
@@ -29,8 +33,10 @@ public class SqlRuParse implements Parse {
     public static void main(String[] args) {
         DateTimeParser dateParser = new SqlRuDateTimeParser();
         Parse parse = new SqlRuParse(dateParser);
-        parse.list(SITE_URL);
-        parse.detail(VACANCY_URL);
+        List<Post> posts = parse.list(SITE_URL);
+        Store store = new PsqlStore(CFG);
+        posts.forEach(store::save);
+        store.getAll().forEach(System.out::println);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.elias.grabber;
+package com.elias.grabber.store;
 
 import java.util.List;
 
