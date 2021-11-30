@@ -1,5 +1,6 @@
-package com.elias.grabber;
+package com.elias.grabber.grab;
 
+import com.elias.grabber.Parse;
 import com.elias.grabber.store.Store;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;

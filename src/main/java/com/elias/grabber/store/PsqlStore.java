@@ -96,9 +96,8 @@ public class PsqlStore implements Store, AutoCloseable {
     }
 
     private Connection initConnection(Properties config) {
-        Connection connection;
-        try (InputStream in = PsqlStore.class.getClassLoader().getResourceAsStream("app.properties")) {
-            config.load(in);
+        Connection connection = null;
+        try {
             Class.forName(config.getProperty("jdbc.driver"));
             connection = DriverManager.getConnection(
                     config.getProperty("jdbc.url"),
@@ -106,7 +105,7 @@ public class PsqlStore implements Store, AutoCloseable {
                     config.getProperty("jdbc.password")
             );
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            e.printStackTrace();
         }
         return connection;
     }
